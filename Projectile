@@ -1,0 +1,69 @@
+import math
+import matplotlib.pyplot as plt
+
+def set_initial(v_initial, theta):
+    vx = v_initial*math.cos(theta)
+    vy = v_initial*math.sin(theta)
+    x = 0
+    y = 0
+    return x,y,vx,vy
+
+def acceleration(vx, vy, beta):
+    v = math.sqrt(vx**2+vy**2)
+    ax = -beta*v*vx
+#note g is a global constant defined in the main program below
+    ay = -beta*v*vy-g
+    return ax, ay
+
+def step_forward(x, y, vx, vy, beta, delta_t):
+    ax, ay = acceleration(vx, vy, beta)
+#calculate x and y components of the v(i+1)
+    vx = vx + delta_t*ax
+    vy = vy + delta_t*ay
+#calculate x and y shift respectively
+    x = x + delta_t*vx
+    y = y + delta_t*vy
+    return x, y, vx, vy
+
+def main():
+    v0 = float(input('Initial velocity [ms-1]: '))
+#input angle in degree and converts to radians
+    theta = math.radians(float(input('Angle from the horizontal [degree]: ')))
+    beta = float(input('Normalised drag coefficient: '))
+    dt = float(input('Step interval [s]: '))
+
+#initiate lists for plot
+    px = []
+    py = []
+
+#initiate calculation
+    x, y, vx, vy = set_initial(v0, theta)
+
+#iterate while y>=0
+    while y>=0:
+
+#add new values to the list for plot
+        px.append(x)
+        py.append(y)
+
+#calculate next step and repeat
+        x, y, vx, vy = step_forward(x, y, vx, vy, beta, dt)
+ 
+#and now print the range and plot the chart from the lists created
+    print('Projectile range [m]: ', max(px))
+    plt.plot(px, py)
+
+#find the max value in both x and y lists and scale axis proportionaly
+#this to secure visuals with reality
+    maxvalueaxis = max(max(px), max(py))
+    plt.ylim(0,maxvalueaxis)
+    plt.xlim(0,maxvalueaxis)
+#define chart axis labels
+    plt.ylabel ('Height [m]')
+    plt.xlabel ('Distance [m]')
+    plt.show()
+
+# define constants
+g = 9.81
+#execute program
+main()
